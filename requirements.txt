@@ -3,3 +3,4 @@ astropy
 numpy
 scipy
 healpy
+torch>=2.0

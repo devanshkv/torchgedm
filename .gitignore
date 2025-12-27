@@ -36,3 +36,21 @@ py312_env/
 .pytest_cache/
 htmlcov/
 .coverage
+
+# Development/experimental files
+*_prototype.py
+*_study.py
+docker_dmdsm_validation.py
+test_differentiability.py
+
+# Analysis/report files (temporary)
+*_ANALYSIS.md
+*_REPORT.md
+*_SUMMARY.md
+SPLINE_VALIDATION.md
+
+# Generated outputs
+plots/
+
+# Tool working directories
+.beads/

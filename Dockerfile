@@ -1,13 +1,44 @@
 # syntax=docker/dockerfile:1
-FROM python:3.8-slim-buster
-RUN apt-get update 
-RUN apt-get install build-essential git f2c pkg-config  -y
-COPY . /app
+FROM ghcr.io/astral-sh/uv:python3.12-trixie
+
+# Install system dependencies needed for building C++ extensions and f2c compilation
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    gfortran \
+    f2c \
+    libf2c2-dev \
+    libopenblas-dev \
+    pkg-config \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
-RUN pip3 install -r requirements.txt
-RUN pip3 install -r requirements_test.txt
-RUN pip3 install .
 
+# Copy project files
+COPY . .
 
+# Create a virtual environment
+RUN uv venv
+
+# Install setuptools explicitly (needed for pkg_resources)
+RUN uv pip install setuptools
+
+# Install dependencies from requirements.txt
+RUN uv pip install -r requirements.txt
+
+# Install test dependencies
+RUN uv pip install -r requirements_test.txt
+
+# Install the package in editable/development mode
+RUN uv pip install -e .
+
+# Activate the virtual environment by default
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Make sure we're using the venv Python
+ENV VIRTUAL_ENV="/app/.venv"
 
 

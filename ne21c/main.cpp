@@ -91,12 +91,38 @@ std::map<std::string, float> density_xyz(float x, float y, float z) {
     wloopi = 0;
     hitclump = 0;
     hitvoid = 0;
-    wvoid = 0;    
+    wvoid = 0;
     density_2001__(&x, &y, &z, &ne1, &ne2, &nea, &negc, &nelism, &necn, &nevn,
-    &f1, &f2, &fa, &fgc, &flism, &fcn, &fvn, &whicharm, &wlism, &wldr, &wlhb, &wlsb, 
+    &f1, &f2, &fa, &fgc, &flism, &fcn, &fvn, &whicharm, &wlism, &wldr, &wlhb, &wlsb,
     &wloopi, &hitclump, &hitvoid, &wvoid);
     float netot = ne1 + ne2 + nea + negc + nelism + necn + nevn;
     result.insert(std::make_pair("ne", netot));
+    // Individual density components
+    result.insert(std::make_pair("ne1", ne1));        // thick disk
+    result.insert(std::make_pair("ne2", ne2));        // thin disk
+    result.insert(std::make_pair("nea", nea));        // spiral arms
+    result.insert(std::make_pair("negc", negc));      // Galactic center
+    result.insert(std::make_pair("nelism", nelism));  // Local ISM
+    result.insert(std::make_pair("necn", necn));      // clumps
+    result.insert(std::make_pair("nevn", nevn));      // voids
+    // Fluctuation parameters
+    result.insert(std::make_pair("f1", f1));
+    result.insert(std::make_pair("f2", f2));
+    result.insert(std::make_pair("fa", fa));          // spiral arms fluctuation
+    result.insert(std::make_pair("fgc", fgc));
+    result.insert(std::make_pair("flism", flism));
+    result.insert(std::make_pair("fcn", fcn));
+    result.insert(std::make_pair("fvn", fvn));
+    // Weight/flag parameters
+    result.insert(std::make_pair("whicharm", (float)whicharm));  // which arm (0-5)
+    result.insert(std::make_pair("wlism", (float)wlism));
+    result.insert(std::make_pair("wldr", (float)wldr));
+    result.insert(std::make_pair("wlhb", (float)wlhb));
+    result.insert(std::make_pair("wlsb", (float)wlsb));
+    result.insert(std::make_pair("wloopi", (float)wloopi));
+    result.insert(std::make_pair("hitclump", (float)hitclump));
+    result.insert(std::make_pair("hitvoid", (float)hitvoid));
+    result.insert(std::make_pair("wvoid", (float)wvoid));
     return result;
 }
 
@@ -145,17 +171,29 @@ PYBIND11_MODULE(ne21c, m) {
     
     m.def("density_xyz", &density_xyz, R"pbdoc(
     Compute electron density at galactocentric coordinates (X, Y, Z)
-    
+
     x,y,z are Galactocentric Cartesian coordinates, measured in kpc (NOT pc!)
     with the axes parallel to (l, b) = (90, 0), (180, 0), and (0, 90) degrees
-    
+
     Args:
         x (float): Galactocentric coordinates in kpc
         y (float): Galactocentric coordinates in kpc
         z (float): Galactocentric coordinates in kpc
-        
+
     Returns:
-        Python dictionary with computed values.
+        Python dictionary with:
+            - ne (float): total electron density (cm^-3)
+            - ne1 (float): thick disk density
+            - ne2 (float): thin disk density
+            - nea (float): spiral arms density
+            - negc (float): Galactic center density
+            - nelism (float): Local ISM density
+            - necn (float): clumps density
+            - nevn (float): voids density
+            - f1, f2, fa, fgc, flism, fcn, fvn (float): fluctuation parameters
+            - whicharm (float): which spiral arm (0-5, 0=none)
+            - wlism, wldr, wlhb, wlsb, wloopi (float): Local ISM weights
+            - hitclump, hitvoid, wvoid (float): clump/void flags
     )pbdoc",
     py::arg("x"),
     py::arg("y"),
