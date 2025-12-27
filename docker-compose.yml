@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  pygedm-dev:
+    build: .
+    image: pygedm-dev:latest
+    container_name: pygedm-dev
+    volumes:
+      - .:/workspace
+      - pygedm-venv:/app/.venv
+    working_dir: /workspace
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
+  torchgedm:
+    build: .
+    image: pygedm-dev:latest
+    container_name: torchgedm-test
+    volumes:
+      - .:/workspace
+      - pygedm-venv:/app/.venv
+    working_dir: /workspace
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+    command: pytest torchgedm/tests/ -v
+
+volumes:
+  pygedm-venv:
